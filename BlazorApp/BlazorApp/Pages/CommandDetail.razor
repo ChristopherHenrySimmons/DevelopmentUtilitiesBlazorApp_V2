@@ -1,0 +1,33 @@
+﻿@page "/commands/commanddetail/{commandId:int}"
+@page "/commands/commanddetail"
+@page "/command"
+@inject ICommandService commandservice;
+@using BlazorApp.Data;
+
+<h3>command Detail</h3>
+<hr />
+
+<div class="col-12 row">
+     <h5 class="col-12 row" style="font-weight:bold">@commandDetails.Title</h5>
+
+     <h6 class="col-12 row">Command:         @commandDetails.Command</h6>
+     <h6 class="col-12 row">Console Type:    @commandDetails.ConsoleType</h6>
+     <h6 class="col-12 row">Modified Date:   @commandDetails.ModifiedDate</h6>
+     <h6 class="col-12 row">Posted Date:     @commandDetails.PostedDate</h6>
+     
+</div>
+
+@code {
+
+     [Parameter]
+     public int commandId { get; set; }
+
+     public CommandData commandDetails { get; set; }
+     //public commandservice commandservice { get; set; }
+
+     protected override async Task OnInitializedAsync()
+     {
+          //commandservice = new commandservice();
+          commandDetails = await commandservice.GetCommandById(commandId);
+     }
+}

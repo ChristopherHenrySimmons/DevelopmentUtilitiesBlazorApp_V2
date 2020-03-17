@@ -1,0 +1,255 @@
+﻿@page "/Commands"
+@inject ICommandService CommandService;
+@inject IJSRuntime JSRuntime;
+@inject HttpClient Http;
+@implements IDisposable;
+@using BlazorApp.Data;
+
+
+<div class="col-12">
+    <h3><b>Enter Command Information</b></h3>
+    <hr />
+
+    <ServerValidations IsVisible="IsVisible" Result="Result">
+        @RecordTitle
+    </ServerValidations>
+
+    <EditForm Model="@Command" OnValidSubmit="@SaveCommand">
+         @*<DataAnnotationsValidator />*@
+
+         <div class="col-12 row">
+              <label class="col-2 font-weight-bold">Title :</label>
+              <input @ref="TitleTextBox" class="form-control col-3" @bind="Command.Title" placeholder="title" />
+              &nbsp;<ValidationMessage For="@(() => Command.Title)" />
+         </div>
+         <br />
+         <div class="col-12 row">
+              <label class="col-2 font-weight-bold">Command :</label>
+              <InputText class="form-control col-3" @bind-Value="Command.Command" placeholder="command" />
+              &nbsp;<ValidationMessage For="@(() => Command.Command)" />
+         </div>
+         <br />
+         <div class="col-12 row">
+              <label class="col-2 font-weight-bold">Console Type :</label>
+              <InputText class="form-control col-3" @bind-Value="Command.ConsoleType" placeholder="console type" />
+              &nbsp;<ValidationMessage For="@(() => Command.ConsoleType)" />
+         </div>
+         <br />
+         <div class="col-12 row">
+              <span class="col-2"></span>
+              <input type="submit" class="form-control col-1 btn btn-primary" value="Save" />
+              <span>&nbsp;</span>
+              <input type="submit" class="form-control col-1 btn btn-primary" value="Clear" />
+         </div>
+
+    </EditForm>
+
+</div>
+
+<br />
+
+<div class="col-10">
+
+    <h3><b>Commands</b></h3>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Title</th>
+                <th>Console Type</th>
+                @*<th>City</th>*@
+                <th>Date Posted</th>
+                <th>Date Modified</th>
+                @*<th>Salary</th>*@
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (CommandList != null)
+            {
+                @foreach (var Command in CommandList)
+                {
+                    <tr>
+                        <td>
+                            <NavLink href=@string.Format("/commands/commanddetail/{0}", @Command.Id)>
+                                @Command.Id
+                            </NavLink>
+                        </td>
+                        <td>@Command.Title</td>
+                        <td>@Command.Command</td>
+                        @*<td>@Command.City</td>*@
+                        <td>@Command.ConsoleType</td>
+                        <td>@Command.PostedDate.Date</td>
+                        <td>@Command.ModifiedDate.Date</td>
+                        @*<td>$@Command.Salary</td>*@
+                        <td>
+                            <a style="text-underline-position:below; cursor:pointer; color:blue; font-weight:bold"
+                               @onclick="(() => EditCommand(Command))">Edit</a> |
+                            <a style="text-underline-position:below; cursor:pointer; color:blue; font-weight:bold"
+                               @onclick="(() => DeleteCommand(Command.Id))">Delete</a>
+                        </td>
+                    </tr>
+                }
+            }
+
+        </tbody>
+    </table>
+</div>
+
+@code {
+
+     public CommandData Command { get; set; }
+     public List<CommandData> CommandList { get; set; }
+
+     public bool IsVisible { get; set; }
+     public bool Result { get; set; }
+     public string RecordTitle { get; set; }
+
+     ElementReference TitleTextBox;
+
+     protected override void OnInitialized()
+     {
+          try
+          {
+               Console.WriteLine("Commands - OnInitialized");
+               base.OnInitialized();
+
+               throw new Exception("OnInitializedException");
+          }
+          catch (Exception)
+          {
+
+               //throw;
+          }
+
+     }
+
+     protected override async Task OnInitializedAsync()
+     {
+          Console.WriteLine("Commands - OnInitializedAsync");
+
+          Command = new CommandData();
+          //CommandList = await CommandService.GetCommands();
+
+          CommandList = new List<CommandData>();
+          CommandList = await Http.GetJsonAsync<List<CommandData>>("https://localhost:5001/api/v2/Commands");
+          CommandList = CommandList.OrderByDescending(comd => comd.Id).ToList();
+
+          //CommandList = null;
+
+          await base.OnInitializedAsync();
+     }
+
+     protected override void OnParametersSet()
+     {
+          Console.WriteLine("Commands - OnParametersSet");
+          base.OnParametersSet();
+     }
+
+     protected override async Task OnParametersSetAsync()
+     {
+          Console.WriteLine("Commands - OnParametersSetAsync");
+          await base.OnParametersSetAsync();
+     }
+
+     protected override void OnAfterRender(bool firstRender)
+     {
+          Console.WriteLine("Commands - OnAfterRender - firstRender = " + firstRender);
+          base.OnAfterRender(firstRender);
+     }
+
+     protected override async Task OnAfterRenderAsync(bool firstRender)
+     {
+          Console.WriteLine("Commands - OnAfterRenderAsync - firstRender = " + firstRender);
+
+          //if (firstRender && Cities == null)
+          //{
+          //    Cities = await JSRuntime.InvokeAsync<string[]>("getCities");
+
+          //    StateHasChanged();
+          //}
+
+          await base.OnAfterRenderAsync(firstRender);
+     }
+
+     protected override bool ShouldRender()
+     {
+          Console.WriteLine("Commands - ShouldRender");
+          return base.ShouldRender();
+     }
+
+     public void Dispose()
+     {
+          try
+          {
+               Console.WriteLine("Commands - Dispose");
+               throw new Exception("DisposeException");
+          }
+          catch (Exception)
+          {
+
+               //throw;
+          }
+
+     }
+
+     private async Task LoadCommands()
+     {
+          CommandList = await Http.GetJsonAsync<List<CommandData>>("https://localhost:5001/api/v2/Commands");
+          CommandList = CommandList.OrderByDescending(auth => auth.Id).ToList();
+
+          StateHasChanged();
+
+     }
+
+     private async Task SaveCommand()
+     {
+          //Result = await CommandService.SaveCommand(Command);
+          Command.PostedDate = DateTime.Now;
+          Command.ModifiedDate = DateTime.Now;
+          
+          if (Command.Id == 0)             
+          await Http.PostJsonAsync("https://localhost:5001/api/v2/Commands", Command);
+        else
+               await Http.PutJsonAsync("https://localhost:5001/api/v2/Commands/" + Command.Id, Command);
+
+          await LoadCommands();
+
+          Result = true;
+          IsVisible = true;
+
+          var Title = Command.Title;
+          var command = Command.Command;
+
+          RecordTitle = Title + " " + command;
+
+          Command = new CommandData();
+
+          //await JSRuntime.InvokeVoidAsync("saveMessage", Title, command);
+          //await JSRuntime.InvokeVoidAsync("setFocusOnElement", TitleTextBox);
+     }
+
+     private async Task DeleteCommand(int Id)
+     {
+          try
+          {
+               throw new Exception("DeleteCommandException");
+
+               await Http.DeleteAsync("https://localhost:5001/api/Commands/" + Id);
+
+               await LoadCommands();
+          }
+          catch (Exception)
+          {
+
+               //throw;
+          }
+
+     }
+
+     private void EditCommand(CommandData argCommand)
+     {
+          Command = argCommand;
+     }
+}
