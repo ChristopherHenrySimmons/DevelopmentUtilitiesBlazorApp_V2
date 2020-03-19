@@ -39,6 +39,7 @@ namespace BlazorApp
             services.AddSingleton<IPublisherService, PublisherService>();
                services.AddSingleton<ICommandService, CommandService>();
                services.AddSingleton<IResourceService, ResourceService>();
+               services.AddSingleton<IProblemService, ProblemService>();
                services.AddBlazoredSessionStorage();
 
             services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();

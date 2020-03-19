@@ -1,0 +1,263 @@
+﻿@page "/problems"
+@inject IProblemService problemservice;
+@inject IJSRuntime JSRuntime;
+@inject HttpClient Http;
+@implements IDisposable;
+@using BlazorApp.Data;
+
+
+<div class="col-12">
+    <h3><b>Enter problem Information</b></h3>
+    <hr />
+
+    <ServerValidations IsVisible="IsVisible" Result="Result">
+        @RecordTitle
+    </ServerValidations>
+
+    <EditForm Model="@problem" OnValidSubmit="@Saveproblem">
+         @*<DataAnnotationsValidator />*@
+
+         <div class="col-12 row">
+              <label class="col-2 font-weight-bold">Title :</label>
+              <input @ref="TitleTextBox" class="form-control col-3" @bind="problem.Title" placeholder="title" />
+              &nbsp;<ValidationMessage For="@(() => problem.Title)" />
+         </div>
+         <br />
+         <div class="col-12 row">
+              <label class="col-2 font-weight-bold">Description :</label>
+              <InputText class="form-control col-3" @bind-Value="problem.Solution" placeholder="problem" />
+              &nbsp;<ValidationMessage For="@(() => problem.Solution)" />
+         </div>
+         <br />
+         <div class="col-12 row">
+              <label class="col-2 font-weight-bold">Link :</label>
+              <InputText class="form-control col-3" @bind-Value="problem.SolutionLink" placeholder="console type" />
+              &nbsp;<ValidationMessage For="@(() => problem.SolutionLink)" />
+         </div>
+         <br />
+         <div class="col-12 row">
+              <label class="col-2 font-weight-bold">Langues :</label>
+              <InputText class="form-control col-3" @bind-Value="problem.Details" placeholder="console type" />
+              &nbsp;<ValidationMessage For="@(() => problem.Details)" />
+         </div>
+         <br />
+         <div class="col-12 row">
+              <span class="col-2"></span>
+              <input type="submit" class="form-control col-1 btn btn-primary" value="Save" />
+              <span>&nbsp;</span>
+              <input type="submit" class="form-control col-1 btn btn-primary" value="Clear" />
+         </div>
+
+    </EditForm>
+
+</div>
+
+<br />
+
+<div class="col-10">
+
+    <h3><b>problems</b></h3>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Title</th>
+                <th>Solution</th>
+                <th>Solution Link</th>
+                <th>Details</th>              
+                <th>Date Posted</th>
+                <th>Date Modified</th>
+                
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (problemList != null)
+            {
+                @foreach (var problem in problemList)
+                {
+                    <tr>
+                        <td>
+                            <NavLink href=@string.Format("/problems/problemdetail/{0}", @problem.Id)>
+                                @problem.Id
+                            </NavLink>
+                        </td>
+                        <td>@problem.Title</td>
+                        <td>@problem.Solution</td>
+                        
+                        <td>@problem.SolutionLink</td>
+                        <td>@problem.Details</td>
+                        <td>@problem.PostedDate.Date</td>
+                        <td>@problem.ModifiedDate.Date</td>
+                        
+                        <td>
+                            <a style="text-underline-position:below; cursor:pointer; color:blue; font-weight:bold"
+                               @onclick="(() => Editproblem(problem))">Edit</a> |
+                            <a style="text-underline-position:below; cursor:pointer; color:blue; font-weight:bold"
+                               @onclick="(() => Deleteproblem(problem.Id))">Delete</a>
+                        </td>
+                    </tr>
+                }
+            }
+
+        </tbody>
+    </table>
+</div>
+
+@code {
+
+     public Problem_V2 problem { get; set; }
+     public List<Problem_V2> problemList { get; set; }
+
+     public bool IsVisible { get; set; }
+     public bool Result { get; set; }
+     public string RecordTitle { get; set; }
+
+     ElementReference TitleTextBox;
+
+     protected override void OnInitialized()
+     {
+          try
+          {
+               Console.WriteLine("problems - OnInitialized");
+               base.OnInitialized();
+
+               throw new Exception("OnInitializedException");
+          }
+          catch (Exception)
+          {
+
+               //throw;
+          }
+
+     }
+
+     protected override async Task OnInitializedAsync()
+     {
+          Console.WriteLine("problems - OnInitializedAsync");
+
+          problem = new Problem_V2();
+          //problemList = await problemservice.Getproblems();
+
+          problemList = new List<Problem_V2>();
+          problemList = await Http.GetJsonAsync<List<Problem_V2>>("https://localhost:5001/api/v2/problems");
+          problemList = problemList.OrderByDescending(comd => comd.Id).ToList();
+
+          //problemList = null;
+
+          await base.OnInitializedAsync();
+     }
+
+     protected override void OnParametersSet()
+     {
+          Console.WriteLine("problems - OnParametersSet");
+          base.OnParametersSet();
+     }
+
+     protected override async Task OnParametersSetAsync()
+     {
+          Console.WriteLine("problems - OnParametersSetAsync");
+          await base.OnParametersSetAsync();
+     }
+
+     protected override void OnAfterRender(bool firstRender)
+     {
+          Console.WriteLine("problems - OnAfterRender - firstRender = " + firstRender);
+          base.OnAfterRender(firstRender);
+     }
+
+     protected override async Task OnAfterRenderAsync(bool firstRender)
+     {
+          Console.WriteLine("problems - OnAfterRenderAsync - firstRender = " + firstRender);
+
+          //if (firstRender && Cities == null)
+          //{
+          //    Cities = await JSRuntime.InvokeAsync<string[]>("getCities");
+
+          //    StateHasChanged();
+          //}
+
+          await base.OnAfterRenderAsync(firstRender);
+     }
+
+     protected override bool ShouldRender()
+     {
+          Console.WriteLine("problems - ShouldRender");
+          return base.ShouldRender();
+     }
+
+     public void Dispose()
+     {
+          try
+          {
+               Console.WriteLine("problems - Dispose");
+               throw new Exception("DisposeException");
+          }
+          catch (Exception)
+          {
+
+               //throw;
+          }
+
+     }
+
+     private async Task Loadproblems()
+     {
+          problemList = await Http.GetJsonAsync<List<Problem_V2>>("https://localhost:5001/api/v2/problems");
+          problemList = problemList.OrderByDescending(auth => auth.Id).ToList();
+
+          StateHasChanged();
+
+     }
+
+     private async Task Saveproblem()
+     {
+          //Result = await problemservice.Saveproblem(problem);
+          problem.PostedDate = DateTime.Now;
+          problem.ModifiedDate = DateTime.Now;
+          
+          if (problem.Id == 0)             
+          await Http.PostJsonAsync("https://localhost:5001/api/v2/problems", problem);
+        else
+               await Http.PutJsonAsync("https://localhost:5001/api/v2/problems/" + problem.Id, problem);
+
+          await Loadproblems();
+
+          Result = true;
+          IsVisible = true;
+
+          var Title = problem.Title;
+          var Solution = problem.Solution;
+
+          RecordTitle = Title + " " + Solution;
+
+          problem = new Problem_V2();
+
+          //await JSRuntime.InvokeVoidAsync("saveMessage", Title, problem);
+          //await JSRuntime.InvokeVoidAsync("setFocusOnElement", TitleTextBox);
+     }
+
+     private async Task Deleteproblem(int Id)
+     {
+          try
+          {
+               throw new Exception("DeleteproblemException");
+
+               await Http.DeleteAsync("https://localhost:5001/api/problems/" + Id);
+
+               await Loadproblems();
+          }
+          catch (Exception)
+          {
+
+               //throw;
+          }
+
+     }
+
+     private void Editproblem(Problem_V2 argproblem)
+     {
+          problem = argproblem;
+     }
+}
