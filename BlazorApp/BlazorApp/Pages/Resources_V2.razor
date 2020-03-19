@@ -1,0 +1,263 @@
+﻿@page "/Resources"
+@inject IResourceService Resourceservice;
+@inject IJSRuntime JSRuntime;
+@inject HttpClient Http;
+@implements IDisposable;
+@using BlazorApp.Data;
+
+
+<div class="col-12">
+    <h3><b>Enter Resource Information</b></h3>
+    <hr />
+
+    <ServerValidations IsVisible="IsVisible" Result="Result">
+        @RecordTitle
+    </ServerValidations>
+
+    <EditForm Model="@Resource" OnValidSubmit="@SaveResource">
+         @*<DataAnnotationsValidator />*@
+
+         <div class="col-12 row">
+              <label class="col-2 font-weight-bold">Title :</label>
+              <input @ref="TitleTextBox" class="form-control col-3" @bind="Resource.Title" placeholder="title" />
+              &nbsp;<ValidationMessage For="@(() => Resource.Title)" />
+         </div>
+         <br />
+         <div class="col-12 row">
+              <label class="col-2 font-weight-bold">Description :</label>
+              <InputText class="form-control col-3" @bind-Value="Resource.Description" placeholder="Resource" />
+              &nbsp;<ValidationMessage For="@(() => Resource.Description)" />
+         </div>
+         <br />
+         <div class="col-12 row">
+              <label class="col-2 font-weight-bold">Link :</label>
+              <InputText class="form-control col-3" @bind-Value="Resource.Link" placeholder="console type" />
+              &nbsp;<ValidationMessage For="@(() => Resource.Link)" />
+         </div>
+         <br />
+         <div class="col-12 row">
+              <label class="col-2 font-weight-bold">Langues :</label>
+              <InputText class="form-control col-3" @bind-Value="Resource.Langues" placeholder="console type" />
+              &nbsp;<ValidationMessage For="@(() => Resource.Langues)" />
+         </div>
+         <br />
+         <div class="col-12 row">
+              <span class="col-2"></span>
+              <input type="submit" class="form-control col-1 btn btn-primary" value="Save" />
+              <span>&nbsp;</span>
+              <input type="submit" class="form-control col-1 btn btn-primary" value="Clear" />
+         </div>
+
+    </EditForm>
+
+</div>
+
+<br />
+
+<div class="col-10">
+
+    <h3><b>Resources</b></h3>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Link</th>
+                <th>Langues</th>              
+                <th>Date Posted</th>
+                <th>Date Modified</th>
+                
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (ResourceList != null)
+            {
+                @foreach (var Resource in ResourceList)
+                {
+                    <tr>
+                        <td>
+                            <NavLink href=@string.Format("/Resources/Resourcedetail/{0}", @Resource.Id)>
+                                @Resource.Id
+                            </NavLink>
+                        </td>
+                        <td>@Resource.Title</td>
+                        <td>@Resource.Description</td>
+                        
+                        <td>@Resource.Link</td>
+                        <td>@Resource.Langues</td>
+                        <td>@Resource.PostedDate.Date</td>
+                        <td>@Resource.ModifiedDate.Date</td>
+                        
+                        <td>
+                            <a style="text-underline-position:below; cursor:pointer; color:blue; font-weight:bold"
+                               @onclick="(() => EditResource(Resource))">Edit</a> |
+                            <a style="text-underline-position:below; cursor:pointer; color:blue; font-weight:bold"
+                               @onclick="(() => DeleteResource(Resource.Id))">Delete</a>
+                        </td>
+                    </tr>
+                }
+            }
+
+        </tbody>
+    </table>
+</div>
+
+@code {
+
+     public Resource_V2 Resource { get; set; }
+     public List<Resource_V2> ResourceList { get; set; }
+
+     public bool IsVisible { get; set; }
+     public bool Result { get; set; }
+     public string RecordTitle { get; set; }
+
+     ElementReference TitleTextBox;
+
+     protected override void OnInitialized()
+     {
+          try
+          {
+               Console.WriteLine("Resources - OnInitialized");
+               base.OnInitialized();
+
+               throw new Exception("OnInitializedException");
+          }
+          catch (Exception)
+          {
+
+               //throw;
+          }
+
+     }
+
+     protected override async Task OnInitializedAsync()
+     {
+          Console.WriteLine("Resources - OnInitializedAsync");
+
+          Resource = new Resource_V2();
+          //ResourceList = await Resourceservice.GetResources();
+
+          ResourceList = new List<Resource_V2>();
+          ResourceList = await Http.GetJsonAsync<List<Resource_V2>>("https://localhost:5001/api/v2/Resources");
+          ResourceList = ResourceList.OrderByDescending(comd => comd.Id).ToList();
+
+          //ResourceList = null;
+
+          await base.OnInitializedAsync();
+     }
+
+     protected override void OnParametersSet()
+     {
+          Console.WriteLine("Resources - OnParametersSet");
+          base.OnParametersSet();
+     }
+
+     protected override async Task OnParametersSetAsync()
+     {
+          Console.WriteLine("Resources - OnParametersSetAsync");
+          await base.OnParametersSetAsync();
+     }
+
+     protected override void OnAfterRender(bool firstRender)
+     {
+          Console.WriteLine("Resources - OnAfterRender - firstRender = " + firstRender);
+          base.OnAfterRender(firstRender);
+     }
+
+     protected override async Task OnAfterRenderAsync(bool firstRender)
+     {
+          Console.WriteLine("Resources - OnAfterRenderAsync - firstRender = " + firstRender);
+
+          //if (firstRender && Cities == null)
+          //{
+          //    Cities = await JSRuntime.InvokeAsync<string[]>("getCities");
+
+          //    StateHasChanged();
+          //}
+
+          await base.OnAfterRenderAsync(firstRender);
+     }
+
+     protected override bool ShouldRender()
+     {
+          Console.WriteLine("Resources - ShouldRender");
+          return base.ShouldRender();
+     }
+
+     public void Dispose()
+     {
+          try
+          {
+               Console.WriteLine("Resources - Dispose");
+               throw new Exception("DisposeException");
+          }
+          catch (Exception)
+          {
+
+               //throw;
+          }
+
+     }
+
+     private async Task LoadResources()
+     {
+          ResourceList = await Http.GetJsonAsync<List<Resource_V2>>("https://localhost:5001/api/v2/Resources");
+          ResourceList = ResourceList.OrderByDescending(auth => auth.Id).ToList();
+
+          StateHasChanged();
+
+     }
+
+     private async Task SaveResource()
+     {
+          //Result = await Resourceservice.SaveResource(Resource);
+          Resource.PostedDate = DateTime.Now;
+          Resource.ModifiedDate = DateTime.Now;
+          
+          if (Resource.Id == 0)             
+          await Http.PostJsonAsync("https://localhost:5001/api/v2/Resources", Resource);
+        else
+               await Http.PutJsonAsync("https://localhost:5001/api/v2/Resources/" + Resource.Id, Resource);
+
+          await LoadResources();
+
+          Result = true;
+          IsVisible = true;
+
+          var Title = Resource.Title;
+          var Description = Resource.Description;
+
+          RecordTitle = Title + " " + Description;
+
+          Resource = new Resource_V2();
+
+          //await JSRuntime.InvokeVoidAsync("saveMessage", Title, Resource);
+          //await JSRuntime.InvokeVoidAsync("setFocusOnElement", TitleTextBox);
+     }
+
+     private async Task DeleteResource(int Id)
+     {
+          try
+          {
+               throw new Exception("DeleteResourceException");
+
+               await Http.DeleteAsync("https://localhost:5001/api/Resources/" + Id);
+
+               await LoadResources();
+          }
+          catch (Exception)
+          {
+
+               //throw;
+          }
+
+     }
+
+     private void EditResource(Resource_V2 argResource)
+     {
+          Resource = argResource;
+     }
+}

@@ -1,0 +1,34 @@
+﻿@page "/resources/resourcedetail/{resourceId:int}"
+@page "/resources/resourcedetail"
+@page "/resource"
+@inject IResourceService resourceservice;
+@using BlazorApp.Data;
+
+<h3>resource Detail</h3>
+<hr />
+
+<div class="col-12 row">
+     <h5 class="col-12 row" style="font-weight:bold">@resourceDetails.Title</h5>
+
+     <h6 class="col-12 row">Description:         @resourceDetails.Description</h6>
+     <h6 class="col-12 row">Link:    @resourceDetails.Link</h6>
+     <h6 class="col-12 row">Langues:    @resourceDetails.Langues</h6>
+     <h6 class="col-12 row">Modified Date:   @resourceDetails.ModifiedDate</h6>
+     <h6 class="col-12 row">Posted Date:     @resourceDetails.PostedDate</h6>
+     
+</div>
+
+@code {
+
+     [Parameter]
+     public int resourceId { get; set; }
+
+     public Resource_V2 resourceDetails { get; set; }
+     //public resourceservice resourceservice { get; set; }
+
+     protected override async Task OnInitializedAsync()
+     {
+          //resourceservice = new resourceservice();
+          resourceDetails = await resourceservice.GetResourceById(resourceId);
+     }
+}
