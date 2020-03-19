@@ -7,32 +7,32 @@ namespace BlazorApp.Data
 {
      public class CommandService : ICommandService
      {
-          public List<CommandData> Commands { get; set; }
+          public List<Command_V2> Commands { get; set; }
 
           public CommandService()
           {
                //throw new Exception("CommandServiceException");
 
-               Commands = new List<CommandData>();
+               Commands = new List<Command_V2>();
 
-               Commands.Add(new CommandData(1, "Title", "Command", "ConsoleType", DateTime.Now, DateTime.Now));
-               Commands.Add(new CommandData(2, "Title", "Command", "ConsoleType", DateTime.Now, DateTime.Now));
-               Commands.Add(new CommandData(3, "Title", "Command", "ConsoleType", DateTime.Now, DateTime.Now));
-               Commands.Add(new CommandData(4, "Title", "Command", "ConsoleType", DateTime.Now, DateTime.Now));
-               Commands.Add(new CommandData(5, "Title", "Command", "ConsoleType", DateTime.Now, DateTime.Now));
+               Commands.Add(new Command_V2(1, "Title", "Command", "ConsoleType", DateTime.Now, DateTime.Now));
+               Commands.Add(new Command_V2(2, "Title", "Command", "ConsoleType", DateTime.Now, DateTime.Now));
+               Commands.Add(new Command_V2(3, "Title", "Command", "ConsoleType", DateTime.Now, DateTime.Now));
+               Commands.Add(new Command_V2(4, "Title", "Command", "ConsoleType", DateTime.Now, DateTime.Now));
+               Commands.Add(new Command_V2(5, "Title", "Command", "ConsoleType", DateTime.Now, DateTime.Now));
           }
 
-          public async Task<List<CommandData>> GetCommands()
+          public async Task<List<Command_V2>> GetCommands()
           {
                return await Task.FromResult(Commands);
           }
 
-          public async Task<CommandData> GetCommandById(int CommandId)
+          public async Task<Command_V2> GetCommandById(int CommandId)
           {
                return await Task.FromResult(Commands.Where(auth => auth.Id == CommandId).FirstOrDefault());
           }
 
-          public async Task<bool> SaveCommand(CommandData Command)
+          public async Task<bool> SaveCommand(Command_V2 Command)
           {
                //Command.CommandId = GetNewCommand();
                Commands.Add(Command);

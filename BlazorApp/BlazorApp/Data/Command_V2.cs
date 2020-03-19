@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BlazorApp.Data
 {
-     public class CommandData
+     public class Command_V2
      {
           public int Id { get; set; }
 
@@ -16,16 +16,18 @@ namespace BlazorApp.Data
           public string Command { get; set; }
           [Required(ErrorMessage = "Console Type is missing")]
           public string ConsoleType { get; set; }
+          [Required(ErrorMessage = "Date Posted is missing")]
           public DateTime PostedDate { get; set; }
+          [Required(ErrorMessage = "Date Modified is missing")]
           public DateTime ModifiedDate { get; set; }
 
-          public CommandData()
+          public Command_V2()
           {
 
           }
 
 
-          public CommandData(int id, string title, string command, string consoleType, DateTime postedDate, DateTime modifiedDate)
+          public Command_V2(int id, string title, string command, string consoleType, DateTime postedDate, DateTime modifiedDate)
           {
                Id = id;
                Title = title;

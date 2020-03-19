@@ -58,10 +58,10 @@
                 <th>Id</th>
                 <th>Title</th>
                 <th>Console Type</th>
-                @*<th>City</th>*@
+                
                 <th>Date Posted</th>
                 <th>Date Modified</th>
-                @*<th>Salary</th>*@
+                
                 <th>Actions</th>
             </tr>
         </thead>
@@ -99,8 +99,8 @@
 
 @code {
 
-     public CommandData Command { get; set; }
-     public List<CommandData> CommandList { get; set; }
+     public Command_V2 Command { get; set; }
+     public List<Command_V2> CommandList { get; set; }
 
      public bool IsVisible { get; set; }
      public bool Result { get; set; }
@@ -129,11 +129,11 @@
      {
           Console.WriteLine("Commands - OnInitializedAsync");
 
-          Command = new CommandData();
+          Command = new Command_V2();
           //CommandList = await CommandService.GetCommands();
 
-          CommandList = new List<CommandData>();
-          CommandList = await Http.GetJsonAsync<List<CommandData>>("https://localhost:5001/api/v2/Commands");
+          CommandList = new List<Command_V2>();
+          CommandList = await Http.GetJsonAsync<List<Command_V2>>("https://localhost:5001/api/v2/Commands");
           CommandList = CommandList.OrderByDescending(comd => comd.Id).ToList();
 
           //CommandList = null;
@@ -196,7 +196,7 @@
 
      private async Task LoadCommands()
      {
-          CommandList = await Http.GetJsonAsync<List<CommandData>>("https://localhost:5001/api/v2/Commands");
+          CommandList = await Http.GetJsonAsync<List<Command_V2>>("https://localhost:5001/api/v2/Commands");
           CommandList = CommandList.OrderByDescending(auth => auth.Id).ToList();
 
           StateHasChanged();
@@ -224,7 +224,7 @@
 
           RecordTitle = Title + " " + command;
 
-          Command = new CommandData();
+          Command = new Command_V2();
 
           //await JSRuntime.InvokeVoidAsync("saveMessage", Title, command);
           //await JSRuntime.InvokeVoidAsync("setFocusOnElement", TitleTextBox);
@@ -248,7 +248,7 @@
 
      }
 
-     private void EditCommand(CommandData argCommand)
+     private void EditCommand(Command_V2 argCommand)
      {
           Command = argCommand;
      }

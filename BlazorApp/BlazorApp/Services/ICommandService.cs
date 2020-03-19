@@ -7,9 +7,9 @@ namespace BlazorApp.Data
 {
     interface ICommandService
     {
-        Task<List<CommandData>> GetCommands();
-        Task<CommandData> GetCommandById(int Id);
-        Task<bool> SaveCommand(CommandData Command);
+        Task<List<Command_V2>> GetCommands();
+        Task<Command_V2> GetCommandById(int Id);
+        Task<bool> SaveCommand(Command_V2 Command);
         Task<bool> DeleteCommand(string Id);
     }
 }
